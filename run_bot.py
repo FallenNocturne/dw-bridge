@@ -1,10 +1,12 @@
 import discord
 import config
 import re
+from twilio.rest import Client
 from sqlalchemy import create_engine, text
 
 bot = discord.Bot()
 engine = create_engine("sqlite:///user_database.db")
+client = Client(account_sid, auth_token)
 
 @bot.event
 async def on_ready():
@@ -19,6 +21,15 @@ async def hello(ctx):
 async def register(ctx):
     await ctx.respond("Sending you a DM...")
     await ctx.author.send("Hello. Please send the word 'REGISTER', then your phone number\nAs in: *REGISTER <phone_no>*")
+
+@bot.slash_command(guild_ids=[config.guild_id],name="notify",description="Notifies specified user")
+async def notify(ctx):
+    await ctx.respond("Sending notification...")
+    message = client.messages.create(  
+                              messaging_service_sid='MG310abb5beea0ce7b5b488d900201268d', 
+                              body='notification!',      
+                              to='+447428352646' 
+                          )
 
 @bot.event
 async def on_message(message):
