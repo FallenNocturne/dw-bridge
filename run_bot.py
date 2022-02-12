@@ -37,6 +37,10 @@ async def notify(ctx, recipient: discord.Member, message: str):
         await ctx.respond("That user is yet to /register")
     conn.close()
 
+@bot.slash_command(guild_ids=[config.guild_id],name="tellme",description="Streams messages from the channel to user")
+async def tellme(ctx):
+    await ctx.respond("Beaming "+ ctx.channel.name+ " to " +ctx.author.name+"...")
+
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
@@ -60,8 +64,7 @@ async def on_message(message):
                 await message.channel.send("Invalid phone number")
         else:
             await message.channel.send("Invalid command. Use 'REGISTER <phone_no>' to register")
-    else:
-        await message.channel.send("This was not from a DM")
+
 
 
 bot.run(config.bot_token)
