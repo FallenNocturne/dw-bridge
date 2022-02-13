@@ -34,4 +34,5 @@ python3 run_bot.py
 ```
 Sends message from SMS to discord channel via webhooks and Zapier (large delay)
 (Bot does not automatically create webhooks)
+/notify can take an optional delay in seconds
 ```
