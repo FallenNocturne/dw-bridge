@@ -3,9 +3,10 @@ import config
 import re
 from twilio.rest import Client
 from sqlalchemy import create_engine, text
+import time
 
 bot = discord.Bot()
-engine = create_engine("sqlite:///C:\\Users\\samrj\\dwbridge-clone\\dw-bridge\\user_database.db")
+engine = create_engine(config.absolute_database_path)
 client = Client(config.account_sid, config.auth_token)
 
 @bot.event
@@ -23,16 +24,17 @@ async def register(ctx):
     await ctx.author.send("Hello. Please send the word 'REGISTER', then your phone number\nAs in: *REGISTER <phone_no>*")
 
 @bot.slash_command(guild_ids=[config.guild_id],name="notify",description="Notifies specified user")
-async def notify(ctx, recipient: discord.Member, message: str):
+async def notify(ctx, recipient: discord.Member, message: str, delay: int = 0):
     conn = engine.connect()
     rec_num = conn.execute(text('SELECT phoneNo FROM userData WHERE userID == %s' % recipient.id)).all()
     if rec_num != []:
+        await ctx.respond("Sending notification with %is delay..." % delay)
+        time.sleep(delay)
         client.messages.create(
             messaging_service_sid=config.messaging_service_sid,
             body=message, 
             to=rec_num[0][0]
                         )
-        await ctx.respond("Sending notification...")
     else:
         await ctx.respond("That user is yet to /register")
     conn.close()
@@ -46,6 +48,13 @@ async def tellme(ctx):
         await ctx.respond("Beaming "+ ctx.channel.name+ " to " +ctx.author.name+"...")
     else:
         await ctx.respond("Already beaming "+ ctx.channel.name+ " to " +ctx.author.name+"...")
+
+@bot.slash_command(guild_ids=[config.guild_id],name="stoptellingme",description="Sgops message stream from the channel to user")
+async def stoptellingme(ctx):
+    conn = engine.connect()
+    conn.execute('DELETE FROM channelData WHERE userID == %s AND channelID == %s' % (ctx.author.id,ctx.channel.id))
+    conn.close()
+    await ctx.respond("Unsubscribed from messages from "+ctx.channel.name)
 
 @bot.event
 async def on_message(message):
