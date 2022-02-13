@@ -1,7 +1,7 @@
 # Discord Bridge
 
 <p align="center">
-<img src="/logo.png" alt="the logo" width=500>
+<img src="/logo.png" alt="the logo" width=250>
 </p>
 The python bot works as a bridge to connect discord to SMS, for those who do not have enough space on their phone for Discord, but would still like to be notified on their phone.
 
