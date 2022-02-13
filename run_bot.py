@@ -39,7 +39,13 @@ async def notify(ctx, recipient: discord.Member, message: str):
 
 @bot.slash_command(guild_ids=[config.guild_id],name="tellme",description="Streams messages from the channel to user")
 async def tellme(ctx):
-    await ctx.respond("Beaming "+ ctx.channel.name+ " to " +ctx.author.name+"...")
+    conn = engine.connect()
+    rec_num = conn.execute(text('SELECT userID FROM userData WHERE userID == %s AND channelID == %s' % (ctx.author.id,ctx.channel.id))).all()
+    if rec_num == []:
+        conn.execute(text('INSERT INTO channelData VALUES (%s,"%s")' % (ctx.channel.id,ctx.author.id)))
+        await ctx.respond("Beaming "+ ctx.channel.name+ " to " +ctx.author.name+"...")
+    else:
+        await ctx.respond("Already beaming "+ ctx.channel.name+ " to " +ctx.author.name+"...")
 
 @bot.event
 async def on_message(message):
